@@ -1,4 +1,4 @@
-name: IaC Pipeline for Static Site
+name: IaC Pipeline
 
 on:
   workflow_dispatch:
