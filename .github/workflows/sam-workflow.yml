@@ -23,6 +23,6 @@ jobs:
           aws-region: us-east-1
 
       # sam build
-      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest -s aws-sam
+      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest --comfig-file ./aws-sam/samconfig.toml --template-file ./aws-sam/template.yml
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
 
