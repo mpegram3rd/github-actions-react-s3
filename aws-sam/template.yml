@@ -75,6 +75,7 @@ Resources:
             ResponseCode: 200
             ResponsePagePath: /index.html
 
+# Outputs shown by sam list
 Outputs:
   WebAppDomain:
     Value: !GetAtt CloudFrontDistribution.DomainName
