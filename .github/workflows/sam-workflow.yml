@@ -1,4 +1,4 @@
-name: React CI
+name: IaC Pipeline for Static Site
 
 on:
   push:
