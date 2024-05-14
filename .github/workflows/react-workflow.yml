@@ -10,12 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.12.x]
-
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.12.x'
       - run: npm install
       - run: npm run build
       # no tests currently... restore if you want to run some

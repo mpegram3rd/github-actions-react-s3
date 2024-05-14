@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.12.x]
-
     steps:
       - uses: actions/checkout@v1
       - uses: aws-actions/setup-sam@v2
