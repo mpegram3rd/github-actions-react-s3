@@ -3,7 +3,7 @@ name: IaC Pipeline for Static Site
 on:
   push:
     branches: ["main"]
-    paths: ['samconfig.toml', 'template.yml']
+    paths: ['aws-sam/**']
 
 jobs:
   build:
@@ -23,6 +23,6 @@ jobs:
           aws-region: us-east-1
 
       # sam build
-      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest
+      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest -s aws-sam
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
 
