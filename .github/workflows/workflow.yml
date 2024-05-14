@@ -28,6 +28,6 @@ jobs:
           aws-region: us-east-1
 
       # sam build
-      - run: sam build --use-container
+      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest
 
       - run: sam deploy
