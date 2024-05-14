@@ -19,7 +19,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # sam build
+      # sam build / deploy
       - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest --config-file ${{ github.workspace }}/aws-sam/samconfig.toml --template-file ${{ github.workspace }}/aws-sam/template.yml
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --config-file ${{ github.workspace }}/aws-sam/samconfig.toml
 
+      # Display SAM information
+      - name: Show Deployment Stack Information
+        run: |
+          sam list stack-outputs --stack-name github-actions-react-s3

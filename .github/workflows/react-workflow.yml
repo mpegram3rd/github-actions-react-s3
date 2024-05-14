@@ -20,7 +20,6 @@ jobs:
       # no tests currently... restore if you want to run some
       # - run: npx vitest
 
-      - uses: aws-actions/setup-sam@v2
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -30,7 +29,3 @@ jobs:
       - name: Sync files to S3 bucket
         run: |
           aws s3 sync dist s3://github-actions-react-s3-github-actions-react-s3 --delete
-
-      - name: Show Deployment Stack Information
-        run: |
-          sam list stack-outputs --stack-name github-actions-react-s3
