@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v1
       - run: npm install
       - run: npm run build
-      - run: npm test
+      # no tests currently... restore if you want to run some
+      # - run: npx vitest
 
       - uses: aws-actions/setup-sam@v1
       - uses: aws-actions/configure-aws-credentials@v1
