@@ -28,7 +28,5 @@ jobs:
 
       # sam build
       - run: sam build --use-container
-        with:
-          args: --acl public-read --follow-symlinks --delete
 
       - run: sam deploy
