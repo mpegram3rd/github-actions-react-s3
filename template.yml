@@ -1,8 +1,8 @@
 # Based off material from here: https://aws.plainenglish.io/deploy-react-web-app-on-aws-s3-and-cloudfront-using-cloudformation-via-aws-sam-cli-409aa479063d
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  SAM Template for React app hosted with S3 and CloudFront
+Description: SAM Template for React app hosted with S3 and CloudFront
+
 Resources:
   # S3 bucket with public access blocked.
   # Will only be accessible through CloudFront via policy
@@ -15,6 +15,7 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
   # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
   GithubActionsReactS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -33,6 +34,7 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+
   WebAppOriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
@@ -41,6 +43,7 @@ Resources:
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
+
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -62,6 +65,7 @@ Resources:
           OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # CORS-S3Origin
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
+
 # this is here because we need to return error control to the React app itself.
         CustomErrorResponses:
           - ErrorCode: 404
@@ -70,6 +74,7 @@ Resources:
           - ErrorCode: 403
             ResponseCode: 200
             ResponsePagePath: /index.html
+
 Outputs:
   WebAppDomain:
     Value: !GetAtt CloudFrontDistribution.DomainName
