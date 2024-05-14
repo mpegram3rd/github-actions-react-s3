@@ -2,8 +2,8 @@ name: React CI
 
 on:
   push:
-    branches:
-      - "main"
+    branches: ["main"]
+    paths: ['public/**', 'src/**', 'package*.json', 'index.html']
 
 jobs:
   build:
@@ -27,11 +27,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # sam build
-      - run: sam build --use-container --build-image amazon/aws-sam-cli-build-image-nodejs20.x:latest
-
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
-
       - name: Sync files to S3 bucket
         run: |
           aws s3 sync dist s3://github-actions-react-s3-github-actions-react-s3 --delete
+
+      - name: Show Deployment Stack Information
+        run: |
+          sam list stack-outputs --stack-name github-actions-react-s3
