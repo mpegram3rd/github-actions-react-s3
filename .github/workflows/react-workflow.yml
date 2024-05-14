@@ -1,6 +1,7 @@
 name: React CI
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
     paths: ['public/**', 'src/**', 'package*.json', 'index.html']
