@@ -31,9 +31,8 @@ jobs:
       - name: Check template for errors
         run: | 
           cd ${{ github.workspace }}/cdk
+          npm ci
           cdk synth --require-approval=never --ci 
-          
-          
 
   deploy:
     if: github.ref_name == 'main'
