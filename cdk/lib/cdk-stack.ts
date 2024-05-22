@@ -1,10 +1,11 @@
 import {Construct} from "constructs";
-import {Size, Stack, StackProps} from 'aws-cdk-lib';
+import { Stack, StackProps} from 'aws-cdk-lib';
 import {
     aws_iam as Iam,
     aws_s3 as S3,
     aws_apigateway as ApiGateway,
 } from "aws-cdk-lib";
+import {PassthroughBehavior} from "aws-cdk-lib/aws-apigateway/lib/integration";
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -74,7 +75,8 @@ export class CdkStack extends Stack {
             },
           ],
           requestParameters: {
-            'method.request.path.proxy': true
+            'method.request.path.proxy': true,
+            'method.request.header.accept': true
           },
         });
   }
@@ -88,6 +90,7 @@ export class CdkStack extends Stack {
       path: `${assetsBucket.bucketName}/{proxy}`,
       options: {
         credentialsRole: executeRole,
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
         integrationResponses: [
           {
             statusCode: '200',
