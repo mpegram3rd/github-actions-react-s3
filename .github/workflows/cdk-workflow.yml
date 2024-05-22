@@ -10,7 +10,7 @@ on:
       - cdk/**
 
 jobs:
-  validate:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -32,12 +32,9 @@ jobs:
         run: | 
           cd ${{ github.workspace }}/cdk
           npm ci
-          cdk synth --require-approval=never --ci 
+          cdk synth --require-approval=never --ci
 
-  deploy:
-    if: github.ref_name == 'main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run CDK Deploy
+      - name: Deploy CDK Template
+        if: github.ref_name == 'main'
         run: |
-          cdk deploy --require-approval=never --ci
+          cdk deploy --require-approval=never --ci        
