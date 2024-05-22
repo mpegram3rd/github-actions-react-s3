@@ -1,0 +1,44 @@
+name: IaC Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - cdk/**
+  pull_request:
+    paths:
+      - cdk/**
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Setup CDK
+        run: |
+          npm install -g aws-cdk
+
+      - name: Check template for errors
+        run: | 
+          cd ${{ github.workspace }}/cdk
+          cdk synth --require-approval=never --ci 
+          
+          
+
+  deploy:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run CDK Deploy
+        run: |
+          cdk deploy --require-approval=never --ci
