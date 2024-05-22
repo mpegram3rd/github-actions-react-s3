@@ -64,21 +64,18 @@ export class CdkStack extends Stack {
   private addAssetsEndpoint(apiGateway: ApiGateway.RestApi,  s3Integration: ApiGateway.AwsIntegration) {
     apiGateway.root
         .addResource('assets')
-        .addResource('{folder}')
-        .addResource('{key}')
+        .addResource("{proxy+}")
         .addMethod('GET', s3Integration, {
           methodResponses: [
             {
               statusCode: '200',
               responseParameters: {
-                'method.response.header.Content-Type': true,
+                'method.response.header.Content-Type': true
               },
             },
           ],
           requestParameters: {
-            'method.request.path.folder': true,
-            'method.request.path.key': true,
-            'method.request.header.Content-Type': true,
+            'method.request.path.proxy': true
           },
         });
   }
@@ -89,7 +86,7 @@ export class CdkStack extends Stack {
     return new ApiGateway.AwsIntegration({
       service: 's3',
       integrationHttpMethod: 'GET',
-      path: `${assetsBucket.bucketName}/{folder}/{key}`,
+      path: `${assetsBucket.bucketName}/{proxy}`,
       options: {
         credentialsRole: executeRole,
         integrationResponses: [
@@ -101,8 +98,7 @@ export class CdkStack extends Stack {
           }
         ],
         requestParameters: {
-          'integration.request.path.folder': 'method.request.path.folder',
-          'integration.request.path.key': 'method.request.path.key'
+          'integration.request.path.proxy': 'method.request.path.proxy'
         }
       }
     });
