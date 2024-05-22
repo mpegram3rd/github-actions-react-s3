@@ -36,8 +36,7 @@ export class CdkStack extends Stack {
       binaryMediaTypes: [
           'image/png', 'image/jpeg', 'image/gif', 'application/octet-stream',
         'application/pdf', 'image/svg+xml', 'image/vnd.microsoft.icon'
-      ],
-      minCompressionSize: Size.bytes(0)
+      ]
     });
   }
 
