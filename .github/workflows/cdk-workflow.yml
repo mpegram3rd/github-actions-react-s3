@@ -1,4 +1,4 @@
-name: IaC Pipeline
+name: CDK Based IaC Pipeline
 
 on:
   workflow_dispatch:
