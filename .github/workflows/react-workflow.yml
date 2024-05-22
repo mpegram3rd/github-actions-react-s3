@@ -28,4 +28,4 @@ jobs:
 
       - name: Sync files to S3 bucket
         run: |
-          aws s3 sync dist s3://github-actions-react-s3-github-actions-react-s3 --delete
+          aws s3 sync dist s3://github-actions-react-static-assets --delete
