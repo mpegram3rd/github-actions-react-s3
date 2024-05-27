@@ -1,15 +1,18 @@
 import {Construct} from "constructs";
-import {App, CfnOutput, RemovalPolicy, Stack, StackProps} from "aws-cdk-lib";
-
 import {
+    App,
+    aws_apigateway as ApiGateway,
+    aws_cloudfront as Cloudfront,
+    aws_cloudfront_origins as Origins,
+    aws_ec2 as EC2,
     aws_iam as Iam,
     aws_s3 as S3,
-    aws_s3_deployment as S3Deploy,
-    aws_cloudfront as Cloudfront,
-    aws_apigateway as ApiGateway,
-    aws_ec2 as EC2,
-    aws_cloudfront_origins as Origins
+    CfnOutput,
+    RemovalPolicy,
+    Stack,
+    StackProps
 } from "aws-cdk-lib";
+import {KeyPairType} from "aws-cdk-lib/aws-ec2";
 
 export class GhaPocStack extends Stack {
     constructor(scope: Construct, id: string, props?:StackProps) {
@@ -64,7 +67,7 @@ export class GhaPocStack extends Stack {
             machineImage: new EC2.AmazonLinuxImage(),
             vpc,
             securityGroup,
-            keyName: 'my-key-pair', // Replace with your key pair name
+            keyName:  'gha-poc-ec2'
         });
 
         // Install necessary packages and start a simple HTTP server on port 8080
