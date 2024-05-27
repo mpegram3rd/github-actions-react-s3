@@ -35,7 +35,7 @@ jobs:
           cdk synth --require-approval=never --ci
 
       - name: Deploy CDK Template
-        if: github.ref_name == 'main'
+#        if: github.ref_name == 'main'
         run: |
           cd ${{ github.workspace }}/cdk
           cdk deploy --require-approval=never --ci        
