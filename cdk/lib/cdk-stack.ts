@@ -41,7 +41,7 @@ export class GhaPocStack extends Stack {
         }));
 
         // Create a VPC
-        const vpc = new EC2.Vpc(this, `${this.stackName}-Vpc`, {
+        const vpc = new EC2.Vpc(this, `Vpc`, {
             maxAzs: 2,
         });
 
@@ -83,7 +83,7 @@ export class GhaPocStack extends Stack {
         // keyPairSecret.addSecretStringField('privateKey', { secretValue: SecretValue.unsafePlainText(privateKey) });
 
         // Create an EC2 instance
-        const ec2Instance = new EC2.Instance(this, `${this.stackName}-ec2-Instance`, {
+        const ec2Instance = new EC2.Instance(this, `Instance`, {
             instanceType: EC2.InstanceType.of(EC2.InstanceClass.T2, EC2.InstanceSize.MICRO),
             machineImage: new EC2.AmazonLinuxImage(),
             vpc,
