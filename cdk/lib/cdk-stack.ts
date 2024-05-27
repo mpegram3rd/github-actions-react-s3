@@ -5,7 +5,9 @@ import {
     aws_iam as Iam,
     aws_s3 as S3,
     aws_s3_deployment as S3Deploy,
-    aws_cloudfront as Cloudfront
+    aws_cloudfront as Cloudfront,
+    aws_apigateway as ApiGateway,
+    aws_ec2 as EC2,
 } from "aws-cdk-lib";
 
 export class GhaPocStack extends Stack {
@@ -75,6 +77,57 @@ export class GhaPocStack extends Stack {
         //     distribution,
         //     distributionPaths: ['/*'],
         // });
+
+        // Create a VPC
+        const vpc = new EC2.Vpc(this, 'Vpc', {
+            maxAzs: 2,
+        });
+
+        // Create a security group for the EC2 instance
+        const securityGroup = new EC2.SecurityGroup(this, 'SecurityGroup', {
+            vpc,
+            description: 'Allow http access to ec2 instance',
+            allowAllOutbound: true,
+        });
+        securityGroup.addIngressRule(EC2.Peer.anyIpv4(), EC2.Port.tcp(8080), 'allow http access from anywhere');
+
+        // Create an EC2 instance
+        const ec2Instance = new EC2.Instance(this, 'Instance', {
+            instanceType: EC2.InstanceType.of(EC2.InstanceClass.T2, EC2.InstanceSize.MICRO),
+            machineImage: new EC2.AmazonLinuxImage(),
+            vpc,
+            securityGroup,
+            keyName: 'my-key-pair', // Replace with your key pair name
+        });
+
+        // Install necessary packages and start a simple HTTP server on port 8080
+        ec2Instance.addUserData(
+            `#!/bin/bash`,
+            `sudo yum install -y httpd`,
+            `sudo systemctl start httpd`,
+            `sudo systemctl enable httpd`,
+            `echo "<html><body><h1>Hello from EC2</h1></body></html>" > /var/www/html/index.html`
+        );
+
+        // Create an API Gateway
+        const api = new ApiGateway.RestApi(this, 'ApiGateway', {
+            restApiName: 'EC2 Service',
+            description: 'This service serves EC2 instance.',
+        });
+
+        const ec2Integration = new ApiGateway.HttpIntegration(`http://${ec2Instance.instancePublicDnsName}:8080`, {
+            proxy: true,
+        });
+
+        const apiResource = api.root.addResource('api');
+        apiResource.addMethod('ANY', ec2Integration, {
+            methodResponses: [{ statusCode: '200' }],
+        });
+
+        // Output the API Gateway URL
+        new CfnOutput(this, 'ApiUrl', {
+            value: api.url,
+        });
     }
 }
 
