@@ -8,6 +8,7 @@ import {
     aws_cloudfront as Cloudfront,
     aws_apigateway as ApiGateway,
     aws_ec2 as EC2,
+    aws_cloudfront_origins as Origins
 } from "aws-cdk-lib";
 
 export class GhaPocStack extends Stack {
@@ -35,40 +36,6 @@ export class GhaPocStack extends Stack {
             principals: [new Iam.CanonicalUserPrincipal(originAccessIdentity.cloudFrontOriginAccessIdentityS3CanonicalUserId)],
         }));
 
-        // Create the CloudFront distribution
-        const distribution = new Cloudfront.CloudFrontWebDistribution(this, 'SiteDistribution', {
-            originConfigs: [
-                {
-                    s3OriginSource: {
-                        s3BucketSource: siteBucket,
-                        originAccessIdentity: originAccessIdentity,
-                    },
-                    behaviors: [
-                        {
-                            isDefaultBehavior: true,
-                            compress: true,
-                            allowedMethods: Cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
-                        },
-                    ],
-                },
-            ],
-            errorConfigurations: [
-                {
-                    errorCode: 404,
-                    responseCode: 200,
-                    responsePagePath: '/index.html',
-                },
-            ],
-        });
-
-        // Output the S3 bucket name and CloudFront distribution domain name
-        new CfnOutput(this, 'BucketName', {
-            value: siteBucket.bucketName,
-        });
-
-        new CfnOutput(this, 'DistributionDomainName', {
-            value: distribution.distributionDomainName,
-        });
 
         // Optional: Deploy static files to the S3 bucket
         // new S3Deploy.BucketDeployment(this, 'DeployWithInvalidation', {
@@ -122,6 +89,35 @@ export class GhaPocStack extends Stack {
         const apiResource = api.root.addResource('api');
         apiResource.addMethod('ANY', ec2Integration, {
             methodResponses: [{ statusCode: '200' }],
+        });
+
+        // Create the CloudFront distribution with multiple origins
+        const distribution = new Cloudfront.Distribution(this, 'SiteDistribution', {
+            defaultBehavior: {
+                origin: new Origins.S3Origin(siteBucket, {
+                    originAccessIdentity: originAccessIdentity,
+                }),
+                viewerProtocolPolicy: Cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            },
+            additionalBehaviors: {
+                '/api/*': {
+                    origin: new Origins.HttpOrigin(`${api.restApiId}.execute-api.${this.region}.amazonaws.com`, {
+                        originPath: `/${api.deploymentStage.stageName}`,
+                    }),
+                    viewerProtocolPolicy: Cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                    allowedMethods: Cloudfront.AllowedMethods.ALLOW_ALL,
+                    cachePolicy: Cloudfront.CachePolicy.CACHING_DISABLED,
+                },
+            },
+        });
+
+        // Output the S3 bucket name and CloudFront distribution domain name
+        new CfnOutput(this, 'BucketName', {
+            value: siteBucket.bucketName,
+        });
+
+        new CfnOutput(this, 'DistributionDomainName', {
+            value: distribution.distributionDomainName,
         });
 
         // Output the API Gateway URL
