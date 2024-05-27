@@ -40,15 +40,13 @@ export class GhaPocStack extends Stack {
             principals: [new Iam.CanonicalUserPrincipal(originAccessIdentity.cloudFrontOriginAccessIdentityS3CanonicalUserId)],
         }));
 
-        // TODO should namespace this
         // Create a VPC
-        const vpc = new EC2.Vpc(this, 'Vpc', {
+        const vpc = new EC2.Vpc(this, `${this.stackName}-Vpc`, {
             maxAzs: 2,
         });
 
-        // TODO should namespace this
         // Create a security group for the EC2 instance
-        const securityGroup = new EC2.SecurityGroup(this, 'SecurityGroup', {
+        const securityGroup = new EC2.SecurityGroup(this, `${this.stackName}-SecurityGroup`, {
             vpc,
             description: 'Allow http access to ec2 instance',
             allowAllOutbound: true,
@@ -85,7 +83,7 @@ export class GhaPocStack extends Stack {
         // keyPairSecret.addSecretStringField('privateKey', { secretValue: SecretValue.unsafePlainText(privateKey) });
 
         // Create an EC2 instance
-        const ec2Instance = new EC2.Instance(this, 'Instance', {
+        const ec2Instance = new EC2.Instance(this, `${this.stackName}-ec2-Instance`, {
             instanceType: EC2.InstanceType.of(EC2.InstanceClass.T2, EC2.InstanceSize.MICRO),
             machineImage: new EC2.AmazonLinuxImage(),
             vpc,
@@ -104,10 +102,10 @@ export class GhaPocStack extends Stack {
         );
 
         // Create an API Gateway
-        const api = new ApiGateway.RestApi(this, 'ApiGateway', {
-            restApiName: 'EC2 Service',
-            description: 'This service serves EC2 instance.',
-        });
+        // const api = new ApiGateway.RestApi(this, 'ApiGateway', {
+        //     restApiName: 'EC2 Service',
+        //     description: 'This service serves EC2 instance.',
+        // });
 
         // const ec2Integration = new ApiGateway.VpcLink(this, 'EC2Integration', {})
         //
@@ -122,7 +120,7 @@ export class GhaPocStack extends Stack {
         // });
 
         // Create the CloudFront distribution with multiple origins
-        const distribution = new Cloudfront.Distribution(this, 'SiteDistribution', {
+        const distribution = new Cloudfront.Distribution(this, `${this.stackName}-SiteDistribution`, {
             defaultBehavior: {
                 origin: new Origins.S3Origin(siteBucket, {
                     originAccessIdentity: originAccessIdentity,
