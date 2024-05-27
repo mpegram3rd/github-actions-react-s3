@@ -110,20 +110,20 @@ export class GhaPocStack extends Stack {
         );
 
         // Create an API Gateway
-        const api = new ApiGateway.RestApi(this, 'ApiGateway', {
-            restApiName: 'EC2 Service',
-            description: 'This service serves EC2 instance.',
-        });
+        // const api = new ApiGateway.RestApi(this, 'ApiGateway', {
+        //     restApiName: 'EC2 Service',
+        //     description: 'This service serves EC2 instance.',
+        // });
 
         const ec2Integration = new ApiGateway.HttpIntegration(`http://${ec2Instance.instancePublicDnsName}:8080`, {
             proxy: true,
         });
-
-        const apiResource = api.root.addResource('api');
-        apiResource.addMethod('ANY', ec2Integration, {
-            methodResponses: [{ statusCode: '200' }],
-        });
-
+        //
+        // const apiResource = api.root.addResource('api');
+        // apiResource.addMethod('ANY', ec2Integration, {
+        //     methodResponses: [{ statusCode: '200' }],
+        // });
+        //
         // Create the CloudFront distribution with multiple origins
         const distribution = new Cloudfront.Distribution(this, 'SiteDistribution', {
             defaultBehavior: {
@@ -132,16 +132,16 @@ export class GhaPocStack extends Stack {
                 }),
                 viewerProtocolPolicy: Cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             },
-            additionalBehaviors: {
-                '/api/*': {
-                    origin: new Origins.HttpOrigin(`${api.restApiId}.execute-api.${this.region}.amazonaws.com`, {
-                        originPath: `/${api.deploymentStage.stageName}`,
-                    }),
-                    viewerProtocolPolicy: Cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-                    allowedMethods: Cloudfront.AllowedMethods.ALLOW_ALL,
-                    cachePolicy: Cloudfront.CachePolicy.CACHING_DISABLED,
-                },
-            },
+            // additionalBehaviors: {
+            //     '/api/*': {
+            //         origin: new Origins.HttpOrigin(`${api.restApiId}.execute-api.${this.region}.amazonaws.com`, {
+            //             originPath: `/${api.deploymentStage.stageName}`,
+            //         }),
+            //         viewerProtocolPolicy: Cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            //         allowedMethods: Cloudfront.AllowedMethods.ALLOW_ALL,
+            //         cachePolicy: Cloudfront.CachePolicy.CACHING_DISABLED,
+            //     },
+            // },
         });
 
         // Output the S3 bucket name and CloudFront distribution domain name
@@ -154,9 +154,9 @@ export class GhaPocStack extends Stack {
         });
 
         // Output the API Gateway URL
-        new CfnOutput(this, 'ApiUrl', {
-            value: api.url,
-        });
+        // new CfnOutput(this, 'ApiUrl', {
+        //     value: api.url,
+        // });
     }
 }
 
