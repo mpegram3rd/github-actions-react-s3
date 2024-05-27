@@ -62,7 +62,7 @@ export class CdkStack extends Stack {
   // 2. {key} which is the name of the file inside the folder
   private addAssetsEndpoint(apiGateway: ApiGateway.RestApi,  s3Integration: ApiGateway.AwsIntegration) {
     apiGateway.root
-        .addResource('assets')
+        .addResource('static')
         .addResource("{proxy+}")
         .addMethod('GET', s3Integration, {
           methodResponses: [
