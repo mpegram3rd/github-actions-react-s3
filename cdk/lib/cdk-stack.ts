@@ -40,20 +40,13 @@ export class GhaPocStack extends Stack {
             principals: [new Iam.CanonicalUserPrincipal(originAccessIdentity.cloudFrontOriginAccessIdentityS3CanonicalUserId)],
         }));
 
-
-        // Optional: Deploy static files to the S3 bucket
-        // new S3Deploy.BucketDeployment(this, 'DeployWithInvalidation', {
-        //     sources: [S3Deploy.Source.asset('./')],
-        //     destinationBucket: siteBucket,
-        //     distribution,
-        //     distributionPaths: ['/*'],
-        // });
-
+        // TODO should namespace this
         // Create a VPC
         const vpc = new EC2.Vpc(this, 'Vpc', {
             maxAzs: 2,
         });
 
+        // TODO should namespace this
         // Create a security group for the EC2 instance
         const securityGroup = new EC2.SecurityGroup(this, 'SecurityGroup', {
             vpc,
@@ -100,6 +93,7 @@ export class GhaPocStack extends Stack {
 //            keyName: `${this.stackName}-key-pair`,
         });
 
+
         // Install necessary packages and start a simple HTTP server on port 8080
         ec2Instance.addUserData(
             `#!/bin/bash`,
@@ -115,14 +109,17 @@ export class GhaPocStack extends Stack {
             description: 'This service serves EC2 instance.',
         });
 
-        const ec2Integration = new ApiGateway.HttpIntegration(`http://${ec2Instance.instancePublicDnsName}:8080`, {
-            proxy: true,
-        });
+        // const ec2Integration = new ApiGateway.VpcLink(this, 'EC2Integration', {})
+        //
+        // })
+        // const ec2Integration = new ApiGateway.HttpIntegration(`http://${ec2Instance.instancePublicDnsName}:8080`, {
+        //     proxy: true,
+        // });
 
-        const apiResource = api.root.addResource('api');
-        apiResource.addMethod('ANY', ec2Integration, {
-            methodResponses: [{ statusCode: '200' }],
-        });
+        // const apiResource = api.root.addResource('api');
+        // apiResource.addMethod('ANY', ec2Integration, {
+        //     methodResponses: [{ statusCode: '200' }],
+        // });
 
         // Create the CloudFront distribution with multiple origins
         const distribution = new Cloudfront.Distribution(this, 'SiteDistribution', {
