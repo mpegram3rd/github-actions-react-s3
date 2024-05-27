@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
-import { CdkStack } from '../lib/cdk-stack';
+import {App} from "aws-cdk-lib";
+import {GhaPocStack} from "../lib/cdk-stack";
 
-const app = new cdk.App();
-new CdkStack(app, 'github-actions-react-s3-stack', {
+const app = new App();
+new GhaPocStack(app, 'gha-poc-stack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
