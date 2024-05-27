@@ -110,20 +110,20 @@ export class GhaPocStack extends Stack {
         );
 
         // Create an API Gateway
-        // const api = new ApiGateway.RestApi(this, 'ApiGateway', {
-        //     restApiName: 'EC2 Service',
-        //     description: 'This service serves EC2 instance.',
-        // });
+        const api = new ApiGateway.RestApi(this, 'ApiGateway', {
+            restApiName: 'EC2 Service',
+            description: 'This service serves EC2 instance.',
+        });
 
         const ec2Integration = new ApiGateway.HttpIntegration(`http://${ec2Instance.instancePublicDnsName}:8080`, {
             proxy: true,
         });
-        //
-        // const apiResource = api.root.addResource('api');
-        // apiResource.addMethod('ANY', ec2Integration, {
-        //     methodResponses: [{ statusCode: '200' }],
-        // });
-        //
+
+        const apiResource = api.root.addResource('api');
+        apiResource.addMethod('ANY', ec2Integration, {
+            methodResponses: [{ statusCode: '200' }],
+        });
+
         // Create the CloudFront distribution with multiple origins
         const distribution = new Cloudfront.Distribution(this, 'SiteDistribution', {
             defaultBehavior: {
