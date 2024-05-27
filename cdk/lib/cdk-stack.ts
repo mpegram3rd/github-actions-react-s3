@@ -120,7 +120,7 @@ export class GhaPocStack extends Stack {
         // });
 
         // Create the CloudFront distribution with multiple origins
-        const distribution = new Cloudfront.Distribution(this, `${this.stackName}-SiteDistribution`, {
+        const distribution = new Cloudfront.Distribution(this, `SiteDistribution`, {
             defaultBehavior: {
                 origin: new Origins.S3Origin(siteBucket, {
                     originAccessIdentity: originAccessIdentity,
