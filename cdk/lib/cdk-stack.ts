@@ -68,7 +68,6 @@ export class GhaPocStack extends Stack {
             value: distribution.distributionDomainName,
         });
 
-        // Disabled for now... Probably want this managed in its own pipeline
         // Optional: Deploy static files to the S3 bucket
         // new S3Deploy.BucketDeployment(this, 'DeployWithInvalidation', {
         //     sources: [S3Deploy.Source.asset('./')],
