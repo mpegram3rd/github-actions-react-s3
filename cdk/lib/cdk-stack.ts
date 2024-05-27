@@ -63,26 +63,26 @@ export class GhaPocStack extends Stack {
         securityGroup.addIngressRule(EC2.Peer.anyIpv4(), EC2.Port.tcp(8080), 'allow http access from anywhere');
 
         // Create the Key Pair using a custom resource...  Configures deletion when resource is deleted
-        const keyPairResource = new CustomResources.AwsCustomResource(this, 'KeyPairResource', {
-            onCreate: {
-                service: 'EC2',
-                action: 'createKeyPair',
-                parameters: {
-                    KeyName: `${this.stackName}-key-pair`,
-                },
-                physicalResourceId: CustomResources.PhysicalResourceId.of(`${this.stackName}-key-pair`),
-            },
-            onDelete: {
-                service: 'EC2',
-                action: 'deleteKeyPair',
-                parameters: {
-                    KeyName: `${this.stackName}-key-pair`,
-                },
-            },
-            policy: CustomResources.AwsCustomResourcePolicy.fromSdkCalls({ resources: CustomResources.AwsCustomResourcePolicy.ANY_RESOURCE }),
-        });
-
-        const privateKey = keyPairResource.getResponseField('KeyMaterial');
+        // const keyPairResource = new CustomResources.AwsCustomResource(this, 'KeyPairResource', {
+        //     onCreate: {
+        //         service: 'EC2',
+        //         action: 'createKeyPair',
+        //         parameters: {
+        //             KeyName: `${this.stackName}-key-pair`,
+        //         },
+        //         physicalResourceId: CustomResources.PhysicalResourceId.of(`${this.stackName}-key-pair`),
+        //     },
+        //     onDelete: {
+        //         service: 'EC2',
+        //         action: 'deleteKeyPair',
+        //         parameters: {
+        //             KeyName: `${this.stackName}-key-pair`,
+        //         },
+        //     },
+        //     policy: CustomResources.AwsCustomResourcePolicy.fromSdkCalls({ resources: CustomResources.AwsCustomResourcePolicy.ANY_RESOURCE }),
+        // });
+        //
+        // const privateKey = keyPairResource.getResponseField('KeyMaterial');
 
         // Create a Secrets Manager secret to store the private key
         // const keyPairSecret = new SecretsManager.Secret(this, 'KeyPairSecret', {
@@ -97,7 +97,7 @@ export class GhaPocStack extends Stack {
             machineImage: new EC2.AmazonLinuxImage(),
             vpc,
             securityGroup,
-            keyName: `${this.stackName}-key-pair`,
+//            keyName: `${this.stackName}-key-pair`,
         });
 
         // Install necessary packages and start a simple HTTP server on port 8080
