@@ -1,9 +1,13 @@
-# Basic React App to workout Github Actions
+# Github Actions / Mono Repo PoC
 
-This project isn't really about the React App so much as it is working out a pattern for publishing
-a React app to an S3 bucket and making it publicly available using Github Actions.
+This project started life to learn how to use `Github Actions`
+with a `React` Application and has morphed into a Proof of Concept
+for ideas about managing a Frontend/Backend apps in a Mono-repo 
+using `Github Actions` for deployment onto AWS infrastructure managed 
+by `CDK`. 
 
 ## Tools needed:
-- Node
-- AWS CLI
-- SAM
+- `Node`
+- `AWS CLI`
+- `CDK`
+- `Java` / `SpringBoot`
