@@ -27,9 +27,9 @@ jobs:
         run: npm run build
 
       # no tests currently... restore if you want to run some
-      # - name: Run Test Suite
-      #   working-directory: ./frontend
-      #   run: npx vitest
+      - name: Run Test Suite
+        working-directory: ./frontend
+        run: npm run test
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
