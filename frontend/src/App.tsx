@@ -2,6 +2,8 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import './components/todo.component.tsx'
+import Todo from "./components/todo.component.tsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,6 +30,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <Todo/>
     </>
   )
 }
