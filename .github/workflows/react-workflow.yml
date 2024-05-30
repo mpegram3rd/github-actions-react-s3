@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '20.12.x'
       - run: cd frontend
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       # no tests currently... restore if you want to run some
       # - run: npx vitest
