@@ -12,16 +12,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
         with:
           node-version: '20.12.x'
-      - run: cd frontend
-      - run: npm ci
-      - run: npm run build
-      # no tests currently... restore if you want to run some
-      # - run: npx vitest
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Restoring Frontend Packages
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Frontend Build
+        working-directory: ./frontend
+        run: npm run build
+
+      # no tests currently... restore if you want to run some
+      # - name: Run Test Suite
+      #   working-directory: ./frontend
+      #   run: npx vitest
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
