@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: ["main"]
-    paths: ['public/**', 'src/**', 'package*.json', 'index.html']
+    paths: ['frontend/public/**', 'frontend/src/**', 'frontend/package*.json', 'frontend/index.html']
 
 jobs:
   build:
@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20.12.x'
+      - run: cd frontend
       - run: npm install
       - run: npm run build
       # no tests currently... restore if you want to run some
@@ -28,4 +29,4 @@ jobs:
 
       - name: Sync files to S3 bucket
         run: |
-          aws s3 sync dist s3://gha-poc-stack-site-bucket --delete
+          aws s3 sync frontend/dist s3://gha-poc-stack-site-bucket --delete
