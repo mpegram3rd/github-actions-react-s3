@@ -15,9 +15,12 @@ import {
     StackProps, SecretValue
 } from "aws-cdk-lib";
 
+import * as Console from "node:console";
+
 export class GhaPocStack extends Stack {
     constructor(scope: Construct, id: string, props?:StackProps) {
         super(scope, id, props);
+        Console.log('Hello from lib/cdk-stack.ts');
 
         // Create the S3 bucket for the React app's static files
         const siteBucket = new S3.Bucket(this, 'SiteBucket', {
@@ -181,5 +184,5 @@ export class GhaPocStack extends Stack {
     }
 }
 
-const app = new App();
-new GhaPocStack(app, 'gha-poc-stack');
+// const app = new App();
+// new GhaPocStack(app, 'gha-poc-stack');
