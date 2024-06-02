@@ -84,7 +84,7 @@ export class GhaPocStack extends Stack {
 
         // Create an EC2 instance
         const ec2Instance = new EC2.Instance(this, `Instance`, {
-            instanceType: EC2.InstanceType.of(EC2.InstanceClass.T2, EC2.InstanceSize.MICRO),
+            instanceType: EC2.InstanceType.of(EC2.InstanceClass.T3, EC2.InstanceSize.NANO),
             machineImage: new EC2.AmazonLinuxImage(),
             vpc,
             securityGroup,
