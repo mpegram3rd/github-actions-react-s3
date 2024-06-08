@@ -32,10 +32,10 @@ jobs:
         run: | 
           cd ${{ github.workspace }}/cdk
           npm ci
-          cdk synth --require-approval=never --ci
+          cdk synth --require-approval=never --ci --all
 
       - name: Deploy CDK Template
 #        if: github.ref_name == 'main'
         run: |
           cd ${{ github.workspace }}/cdk
-          cdk deploy --require-approval=never --ci        
+          cdk deploy --require-approval=never --ci --all   
