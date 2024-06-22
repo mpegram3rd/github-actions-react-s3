@@ -69,6 +69,10 @@ export class BackendFargateCdkStack extends Stack {
             }
         });
 
+        // Reduces connection time to live during a redeploy so draining happens faster
+        // API should be stateless so this does not need to be very long
+        backendApp.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '5');
+
         backendApp.targetGroup.configureHealthCheck({
             port: 'traffic-port',
             path: '/',
