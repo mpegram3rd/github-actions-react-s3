@@ -25,12 +25,12 @@ export class BackendFargateCdkStack extends Stack {
 
         const backendFargateApplicationCluster = new ECS.Cluster(this, `${this.stackName}-cluster`, {
             vpc,
-            clusterName: "application-cluster"
+            clusterName: `${this.stackName}-cluster`
         });
 
         // Create an ECR Repository to store our docker images(?)
         const repo = new ECR.Repository(this, `${this.stackName}-ecr-repo`, {
-            repositoryName: `${this.stackName}-repository`, // TODO this likely needs to change
+            repositoryName: `${this.stackName}-image`,
             removalPolicy: RemovalPolicy.DESTROY
         });
 
@@ -54,15 +54,16 @@ export class BackendFargateCdkStack extends Stack {
             desiredCount: 2,
             cpu: 256,
             memoryLimitMiB: 512,
+            serviceName: `${this.stackName}-service`,
             taskImageOptions: {
                 // Have backend pipeline build docker image and store as uploaded artifact
                 // then have this cdk download artifact and deploy using fromTarball
                 // image: ECS.ContainerImage.fromAsset('../backend'),
 
                 // starts with dummy image which the pipeline will later overwrite with our image
-                image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"), // TODO can we leave this out?
-                containerName: 'backend-fargate-container', // TODO this likely needs to change
-                family: 'fargate-backend-task-defn',  // TODO this likely needs to change
+                image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"),
+                containerName: `${this.stackName}-container`,
+                family: `${this.stackName}-task-defn`,
                 containerPort: 80,
                 executionRole
             }
