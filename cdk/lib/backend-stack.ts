@@ -63,20 +63,20 @@ export class BackendFargateCdkStack extends Stack {
                 image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"), // TODO can we leave this out?
                 containerName: 'backend-fargate-container', // TODO this likely needs to change
                 family: 'fargate-backend-task-defn',  // TODO this likely needs to change
-                containerPort: 8080,
+                containerPort: 80,
                 executionRole
             }
-        })
+        });
 
         backendApp.targetGroup.configureHealthCheck({
             port: 'traffic-port',
-            path: '/health',
+            path: '/',
             interval: Duration.seconds(30),
             timeout: Duration.seconds(10),
             healthyThresholdCount: 2,
             unhealthyThresholdCount: 2,
-            healthyHttpCodes: "200,301,302"
-        })
+            healthyHttpCodes: "200,301,302",
+        });
 
         const springbootAutoScaling = backendApp.service.autoScaleTaskCount({
             maxCapacity: 2,
@@ -88,7 +88,7 @@ export class BackendFargateCdkStack extends Stack {
             policyName: "cpu-autoscaling-policy",
             scaleInCooldown: Duration.seconds(30),
             scaleOutCooldown: Duration.seconds(30)
-        })
+        });
 
     }
 }
