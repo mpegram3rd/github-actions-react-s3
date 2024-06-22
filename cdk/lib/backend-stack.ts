@@ -28,16 +28,31 @@ export class BackendFargateCdkStack extends Stack {
         const vpc = new EC2.Vpc(this, `${this.stackName}-vpc`, {
             maxAzs: 2,
             natGateways: 1
-        })
+        });
 
         const backendFargateApplicationCluster = new ECS.Cluster(this, `${this.stackName}-cluster`, {
             vpc,
             clusterName: "application-cluster"
-        })
+        });
 
         // Create an ECR Repository to store our docker images(?)
-        const repo = new ECR.Repository(this, "Repo", {
-            repositoryName: "fargate-app-repository" // TODO this likely needs to change
+        const repo = new ECR.Repository(this, `${this.stackName}-ecr-repo`, {
+            repositoryName: `${this.stackName}-repository` // TODO this likely needs to change
+        });
+
+        repo.addLifecycleRule({
+            rulePriority: 1,
+            description: "Expire after Max Containers",
+            maxImageCount: 2
+        });
+
+        const executionRole = new Iam.Role(this, "ExecutionRole", {
+            assumedBy: new Iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+            managedPolicies: [
+                Iam.ManagedPolicy.fromAwsManagedPolicyName(
+                    "service-role/AmazonECSTaskExecutionRolePolicy"
+                ),
+            ],
         });
 
         const backendApp = new ECS_PATTERNS.ApplicationLoadBalancedFargateService(this, `${this.stackName}-load-balanced-application`, {
@@ -49,16 +64,19 @@ export class BackendFargateCdkStack extends Stack {
                 // Have backend pipeline build docker image and store as uploaded artifact
                 // then have this cdk download artifact and deploy using fromTarball
                 // image: ECS.ContainerImage.fromAsset('../backend'),
-                image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"), // TODO this likely needs to change
+
+                // starts with dummy image which the pipeline will later overwrite with our image
+                image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"), // TODO can we leave this out?
                 containerName: 'backend-fargate-container', // TODO this likely needs to change
                 family: 'fargate-backend-task-defn',  // TODO this likely needs to change
                 containerPort: 8080,
+                executionRole
             }
         })
 
         backendApp.targetGroup.configureHealthCheck({
             port: 'traffic-port',
-            path: '/actuator/health',
+            path: '/health',
             interval: Duration.seconds(30),
             timeout: Duration.seconds(10),
             healthyThresholdCount: 2,
