@@ -43,7 +43,7 @@ jobs:
   deploy-infrastructure:
     if: github.ref_name == 'main'
     runs-on: ubuntu-latest
-    needs: ["build-job"]
+    needs: ["validate-template"]
     defaults:
       run:
         working-directory: ${{ env.CDK_BASE_DIR }}
