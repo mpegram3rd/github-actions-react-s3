@@ -76,8 +76,8 @@ export class BackendFargateCdkStack extends Stack {
         backendApp.targetGroup.configureHealthCheck({
             port: 'traffic-port',
             path: '/',
-            interval: Duration.seconds(30),
-            timeout: Duration.seconds(10),
+            interval: Duration.seconds(45),
+            timeout: Duration.seconds(20),
             healthyThresholdCount: 2,
             unhealthyThresholdCount: 2,
             healthyHttpCodes: "200,301,302",
