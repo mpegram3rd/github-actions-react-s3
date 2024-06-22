@@ -1,21 +1,14 @@
 import {Construct} from "constructs";
 import {
-    App,
-    aws_apigateway as ApiGateway,
-    aws_cloudfront as Cloudfront,
-    aws_cloudfront_origins as Origins,
     aws_ec2 as EC2,
-    aws_ecs as ECS,
     aws_ecr as ECR,
+    aws_ecs as ECS,
     aws_ecs_patterns as ECS_PATTERNS,
     aws_iam as Iam,
-    aws_s3 as S3,
-    custom_resources as CustomResources,
-    aws_secretsmanager as SecretsManager,
-    CfnOutput,
+    Duration,
     RemovalPolicy,
     Stack,
-    StackProps, SecretValue, Duration
+    StackProps
 } from "aws-cdk-lib";
 
 import * as Console from "node:console";
@@ -37,7 +30,8 @@ export class BackendFargateCdkStack extends Stack {
 
         // Create an ECR Repository to store our docker images(?)
         const repo = new ECR.Repository(this, `${this.stackName}-ecr-repo`, {
-            repositoryName: `${this.stackName}-repository` // TODO this likely needs to change
+            repositoryName: `${this.stackName}-repository`, // TODO this likely needs to change
+            removalPolicy: RemovalPolicy.DESTROY
         });
 
         repo.addLifecycleRule({
