@@ -6,6 +6,7 @@ import {
     aws_cloudfront_origins as Origins,
     aws_ec2 as EC2,
     aws_ecs as ECS,
+    aws_ecr as ECR,
     aws_ecs_patterns as ECS_PATTERNS,
     aws_iam as Iam,
     aws_s3 as S3,
@@ -34,13 +35,23 @@ export class BackendFargateCdkStack extends Stack {
             clusterName: "application-cluster"
         })
 
+        // Create an ECR Repository to store our docker images(?)
+        const repo = new ECR.Repository(this, "Repo", {
+            repositoryName: "fargate-app-repository" // TODO this likely needs to change
+        });
+
         const backendApp = new ECS_PATTERNS.ApplicationLoadBalancedFargateService(this, `${this.stackName}-load-balanced-application`, {
             cluster: backendFargateApplicationCluster,
             desiredCount: 2,
             cpu: 256,
             memoryLimitMiB: 512,
             taskImageOptions: {
-                image: ECS.ContainerImage.fromAsset('../backend'),
+                // Have backend pipeline build docker image and store as uploaded artifact
+                // then have this cdk download artifact and deploy using fromTarball
+                // image: ECS.ContainerImage.fromAsset('../backend'),
+                image: ECS.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"), // TODO this likely needs to change
+                containerName: 'backend-fargate-container', // TODO this likely needs to change
+                family: 'fargate-backend-task-defn',  // TODO this likely needs to change
                 containerPort: 8080,
             }
         })
