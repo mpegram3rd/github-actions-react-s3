@@ -1,0 +1,83 @@
+name: Services Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    paths:
+      - backend/**
+
+env:
+  SERVICES_BASE_DIR: ./backend
+  SERVICES_DIST_DIR: ./backend/build/libs
+
+jobs:
+  build-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 22
+
+      - name: Build and Test
+        working-directory: ${{ env.SERVICES_BASE_DIR }}
+        run: |
+          ./gradlew clean test
+
+  deploy-job:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: ["build-job"]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 22
+
+      - name: Create Deployable Package
+        working-directory: ${{ env.SERVICES_BASE_DIR }}
+        run: |
+          ./gradlew bootJar
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Connect to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition fargate-backend-task-defn --query taskDefinition > task-definition.json
+
+      - name: Build, tag, and push image to Amazon
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: backend-fargate-stack-repository
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
