@@ -16,6 +16,7 @@ on:
 env:
   SERVICES_BASE_DIR: ./backend
   SERVICES_DIST_DIR: ./backend/build/libs
+  DEPLOYMENT_STACKNAME: backend-fargate-stack
 
 jobs:
   build-job:
@@ -73,15 +74,31 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition fargate-backend-task-defn --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition ${{ env.DEPLOYMENT_STACKNAME }}-task-defn --query taskDefinition > task-definition.json
 
       - name: Build, tag, and push image to Amazon
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: backend-fargate-stack-repository
+          ECR_REPOSITORY: ${{ env.DEPLOYMENT_STACKNAME }}-image
           IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Fill in the new image ID in the AWS ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.DEPLOYMENT_STACKNAME }}-container
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Image using Task Definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.DEPLOYMENT_STACKNAME }}-service
+          cluster: ${{ env.DEPLOYMENT_STACKNAME }}-cluster
+          wait-for-service-stability: true
