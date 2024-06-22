@@ -3,9 +3,12 @@ name: CDK Based IaC Pipeline
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - cdk/**
   pull_request:
+    types: [ opened, reopened, synchronize ]
     paths:
       - cdk/**
 
@@ -20,7 +23,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -34,8 +37,3 @@ jobs:
           npm ci
           cdk synth --require-approval=never --ci --all
 
-      - name: Deploy CDK Template
-#        if: github.ref_name == 'main'
-        run: |
-          cd ${{ github.workspace }}/cdk
-          cdk deploy --require-approval=never --ci --all   
