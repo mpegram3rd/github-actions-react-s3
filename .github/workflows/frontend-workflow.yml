@@ -16,8 +16,8 @@ on:
       - frontend/src/**
       - frontend/package*.json
 env:
-  FRONTEND_BASE_DIR: ./frontend/client
-  FRONTEND_DIST_DIR: ./frontend/client/dist
+  FRONTEND_BASE_DIR: ./frontend
+  FRONTEND_DIST_DIR: ./frontend/dist
 
 jobs:
   build:
